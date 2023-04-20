@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
           }
     
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             initialRoute: '/task-list',
             routes: {
               '/task-create': (context) => TaskCreatePage(),
