@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:task_list/task-list.dart';
 
 class TaskCreatePage extends StatefulWidget {
   @override
@@ -9,6 +10,7 @@ class TaskCreatePage extends StatefulWidget {
 class _TasksScreenState extends State<TaskCreatePage> {
   final TextEditingController _nameController = TextEditingController();
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  String _selectedPriority = 'low';
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +30,17 @@ class _TasksScreenState extends State<TaskCreatePage> {
                 )
             ),
             DropdownButtonFormField<String>(
-              value: 'low',
+              value: _selectedPriority,
               items: [
-                DropdownMenuItem(value: 'low', child: Text('Baixa')),
-                DropdownMenuItem(value: 'medium', child: Text('Média')),
-                DropdownMenuItem(value: 'high', child: Text('Alta')),
+                DropdownMenuItem(value: 'low', child: Text('Prioridade Baixa')),
+                DropdownMenuItem(value: 'medium', child: Text('Prioridade Média')),
+                DropdownMenuItem(value: 'high', child: Text('Prioridade Alta')),
               ],
-              onChanged: (value) {},
+              onChanged: (value) {
+                setState(() {
+                  _selectedPriority = value!; 
+                });
+              },
               decoration: InputDecoration(
                 hintText: 'Prioridade',
               ),
@@ -45,7 +51,8 @@ class _TasksScreenState extends State<TaskCreatePage> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pop(context);
+                      // Navigator.pop(context);
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => TaskListPage()));
                     },
                     child: Text('Cancelar'),
                   ),
@@ -55,7 +62,7 @@ class _TasksScreenState extends State<TaskCreatePage> {
                         if (name.isNotEmpty) {
                           await _db.collection('tasks').add({
                             'name': name,
-                            'priority': 'low',
+                            'priority': _selectedPriority,
                             'finished': false,
                           });
                           _nameController.clear();
