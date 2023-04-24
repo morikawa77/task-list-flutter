@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'task.dart';
 import 'package:flutter/material.dart';
 
-
 class TaskListPage extends StatefulWidget {
   @override
   _TasksScreenState createState() => _TasksScreenState();
@@ -23,8 +22,9 @@ class _TasksScreenState extends State<TaskListPage> {
     }
 
     return Scaffold(
+      backgroundColor: Color(0xFFD1C4E9),
       appBar: AppBar(
-        title: Text("Tasks"),
+        title: Text("Tarefas", style: TextStyle(fontSize: 24.0, color: Colors.white),),
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 12),
@@ -60,58 +60,105 @@ class _TasksScreenState extends State<TaskListPage> {
                 finished: doc['finished'],
               )).toList();
 
-          return ListView(
-            children: tasks.map((task) {
-              return Dismissible(
-                key: Key(task.id!),
-                onDismissed: (_) async {
-                  await _db.collection('tasks').doc(task.id).delete();
-                },
-                child: CheckboxListTile(
-                  title: Text(
-                    task.name!,
-                    style: TextStyle(
-                      fontSize: 24,
-                      // fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  value: task.finished!,
-                  onChanged: null,
-                  subtitle: DropdownButtonFormField<String>(
-                    value: '${task.priority}_${task.id}',
-                        style: TextStyle(
-                        fontSize: 12,
-                        // fontWeight: FontWeight.bold,
-                        color: Colors.grey,
+
+          return Container(
+            margin: EdgeInsets.only(top: 30.0),
+            child: ListView(
+              children: tasks.map((task) {
+                return Dismissible(
+                  key: Key(task.id!),
+                  confirmDismiss: (direction) {
+                    return showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          backgroundColor: Color(0xFFD1C4E9),
+                          title: Text('Apagar tarefa'),
+                          content: Text('Deseja realmente apagar a tarefa?'),
+                          actions: <Widget>[
+                            ElevatedButton(
+                              onPressed: () {
+                                // Navigator.pop(context, false);
+                                Navigator.of(
+                                  context,
+                                  // rootNavigator: true,
+                                ).pop(false);
+                              },
+                              child: Text('Cancelar'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                // Navigator.pop(context, true);
+                                Navigator.of(
+                                  context,
+                                  // rootNavigator: true,
+                                ).pop(true);
+                              },
+                              child: Text('Apagar'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  onDismissed: (_) async {
+                    await _db.collection('tasks').doc(task.id).delete();
+                  },
+                  child: CheckboxListTile(
+                    title: Text(
+                      task.name!,
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Color(0xFF673AB7),
                       ),
-                    items: [
-                      DropdownMenuItem(value: 'low_${task.id}', child: Text('Prioridade Baixa')),
-                      DropdownMenuItem(value: 'medium_${task.id}', child: Text('Prioridade Média')),
-                      DropdownMenuItem(value: 'high_${task.id}', child: Text('Prioridade Alta')),
-                    ],
-                    onChanged: (String? value) async {
-                      setState(() {
-                        task.priority = value!;
-                      });
-                      String? priority = task.priority?.split('_')[0];
-                      await updateTaskField(task.id!, 'priority', priority);
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Prioridade',
                     ),
+                    value: task.finished!,
+                    // onChanged: null,
+                    onChanged: (bool? value) async {
+                      setState(() {
+                        task.finished = value!;
+                      });
+                      await updateTaskField(task.id!, 'finished', task.finished);
+                    },
+                    subtitle: DropdownButtonFormField<String>(
+                      dropdownColor: Color(0xFFD1C4E9),
+                      icon: Icon(
+                        Icons.arrow_drop_down, 
+                        color: Color(0xFFE040FB),
+                      ),
+                      value: '${task.priority}_${task.id}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF212121),
+                      ),
+                      items: [
+                        DropdownMenuItem(value: 'low_${task.id}', child: Text('Prioridade Baixa')),
+                        DropdownMenuItem(value: 'medium_${task.id}', child: Text('Prioridade Média')),
+                        DropdownMenuItem(value: 'high_${task.id}', child: Text('Prioridade Alta')),
+                      ],
+                      onChanged: (String? value) async {
+                        setState(() {
+                          task.priority = value!;
+                        });
+                        String? priority = task.priority?.split('_')[0];
+                        await updateTaskField(task.id!, 'priority', priority);
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'Prioridade',
+                      ),
+                    ),
+                    // subtitle: Text(task.priority!),
+                    // value: task.finished!,
+                    // onChanged: (bool? value) async {
+                    //   setState(() {
+                    //     task.finished = value!;
+                    //   });
+                    //   await updateTaskField(task.id!, 'finished', task.finished);
+                    // },
                   ),
-                  // subtitle: Text(task.priority!),
-                  // value: task.finished!,
-                  // onChanged: (bool? value) async {
-                  //   setState(() {
-                  //     task.finished = value!;
-                  //   });
-                  //   await updateTaskField(task.id!, 'finished', task.finished);
-                  // },
-                ),
-              );
-            }).toList(),
+                );
+              }).toList(),
+            ),
           );
         },
       ),

@@ -4,7 +4,6 @@ import 'package:task_list/task-create.dart';
 import 'package:task_list/task-list.dart';
 import 'firebase_options.dart';
 
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
@@ -31,6 +30,24 @@ class MyApp extends StatelessWidget {
           }
     
           return MaterialApp(
+            theme: ThemeData(
+              primarySwatch: Colors.deepPurple,
+              colorScheme: ColorScheme.fromSwatch().copyWith(
+                primary: Color(0xFF673AB7),
+                secondary: Color(0xFFE040FB),
+              ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white, 
+                  backgroundColor: Color(0xFF673AB7),
+                  elevation: 4.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                ),
+              ),
+            ),
+            
             debugShowCheckedModeBanner: false,
             initialRoute: '/task-list',
             routes: {
