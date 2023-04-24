@@ -1,4 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:task_list/login.dart';
+import 'main.dart';
 import 'task.dart';
 import 'package:flutter/material.dart';
 
@@ -12,10 +15,12 @@ class _TasksScreenState extends State<TaskListPage> {
   bool showFinishedTasks = true;
   bool isButtonPressed = false;
 
+  final user = FirebaseAuth.instance.currentUser;
+
   @override
   Widget build(BuildContext context) {
     Query tasksQuery =
-        _db.collection('tasks').orderBy('priority').orderBy('name');
+        _db.collection('tasks').where('userId', isEqualTo: user?.uid).orderBy('priority').orderBy('name');
 
     if (showFinishedTasks == false) {
       tasksQuery = tasksQuery.where('finished', isEqualTo: false);
@@ -28,15 +33,27 @@ class _TasksScreenState extends State<TaskListPage> {
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 12),
-            child: IconButton(
-              icon: isButtonPressed ? Icon(Icons.task_outlined) :  Icon(Icons.task_sharp),
-              onPressed: () {
-                setState(() {
-                  showFinishedTasks = !showFinishedTasks;
-                  isButtonPressed = !isButtonPressed;
-                });
-              },
-            ),
+            child: 
+              Row(
+                children: [
+                  IconButton(
+                    icon: isButtonPressed ? Icon(Icons.task_outlined) :  Icon(Icons.task_sharp),
+                    onPressed: () {
+                      setState(() {
+                        showFinishedTasks = !showFinishedTasks;
+                        isButtonPressed = !isButtonPressed;
+                      });
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.logout),
+                    onPressed: () async {
+                      await FirebaseAuth.instance.signOut();
+                      runApp(MyApp());
+                    },
+                  )
+                ],
+              ),
           ),
         ],
       ),
@@ -44,8 +61,8 @@ class _TasksScreenState extends State<TaskListPage> {
         stream: tasksQuery.snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
-            return Text('Erro: ${snapshot.error}');
-            // print(snapshot.error);
+            // return Text('Erro: ${snapshot.error}');
+            print(snapshot.error);
           }
 
           if (!snapshot.hasData) {

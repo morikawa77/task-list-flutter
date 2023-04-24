@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:task_list/task-create.dart';
 import 'package:task_list/task-list.dart';
 import 'firebase_options.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'login.dart'; // Auth
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,6 +13,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return Directionality(
@@ -28,7 +32,7 @@ class MyApp extends StatelessWidget {
               child: CircularProgressIndicator(),
             );
           }
-    
+          final FirebaseAuth _auth = FirebaseAuth.instance; // Auth
           return MaterialApp(
             theme: ThemeData(
               primarySwatch: Colors.deepPurple,
@@ -49,13 +53,13 @@ class MyApp extends StatelessWidget {
             ),
             
             debugShowCheckedModeBanner: false,
-            initialRoute: '/task-list',
+            initialRoute: '/login',
             routes: {
+              '/login': (context) => LoginPage(),
               '/task-create': (context) => TaskCreatePage(),
               '/task-list': (context) => TaskListPage()
             },
           );
-          
         },
       ),
     );

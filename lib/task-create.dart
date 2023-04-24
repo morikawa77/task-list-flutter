@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:task_list/task-list.dart';
 
@@ -11,6 +12,8 @@ class _TasksScreenState extends State<TaskCreatePage> {
   final TextEditingController _nameController = TextEditingController();
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   String _selectedPriority = 'low';
+
+  final user = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -86,6 +89,7 @@ class _TasksScreenState extends State<TaskCreatePage> {
                                   'name': name,
                                   'priority': _selectedPriority,
                                   'finished': false,
+                                  'userId': user?.uid,
                                 });
                                 _nameController.clear();
                                 Navigator.pop(context);
